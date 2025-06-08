@@ -93,6 +93,9 @@ jobs:
       - name: 安装 feeds
         run: cd openwrt/ && ./scripts/feeds install -a
 
+      - name: 修正 Rust Makefile 以跳过 CI-LLVM 下载
+        run: sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' openwrt/feeds/packages/lang/rust/Makefile
+
       - name: 加载自定义配置
         run: |
           [ -e files ] && mv files/ openwrt/files/
