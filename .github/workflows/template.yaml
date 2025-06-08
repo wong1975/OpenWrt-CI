@@ -146,11 +146,11 @@ jobs:
         with:
           name: XiaoMi-AX3600
           path: |
-            .config
+            #.config
             found.config
-            openwrt/.config
-            openwrt/found.config
-            $GITHUB_WORKSPACE/.config
+            #openwrt/.config
+            #openwrt/found.config
+            #$GITHUB_WORKSPACE/.config
             $GITHUB_WORKSPACE/found.config
 
       - name: 编译固件
