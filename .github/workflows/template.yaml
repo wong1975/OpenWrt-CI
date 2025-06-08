@@ -155,12 +155,12 @@ jobs:
             $GITHUB_WORKSPACE/.config
             $GITHUB_WORKSPACE/found.config
 
-      - name: 单独清理并编译 GCC
-        run: |
-          cd openwrt
-          make tools/compile -j$(nproc) V=s
-          make toolchain/compile -j$(nproc) V=s
-          make package/feeds/packages/gcc/{clean,compile} V=s
+     #- name: 单独清理并编译 GCC
+     #   run: |
+     #     cd openwrt
+     #     make tools/compile -j$(nproc) V=s
+     #     make toolchain/compile -j$(nproc) V=s
+     #     make package/feeds/packages/gcc/{clean,compile} V=s
 
       - name: 编译固件
         id: compile
