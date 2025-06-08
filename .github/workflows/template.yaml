@@ -71,14 +71,17 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          apt-get update
-          apt-get install -y tzdata gnupg
-          apt-get install -y $BUILD_DEPENDS
-          apt-get autoremove --purge -y
-          apt-get clean
-          echo "$TIME_ZONE" > /etc/timezone
-          mkdir -p /workdir/
-          chown $(id -u):$(id -g) /workdir/
+          #apt-get update
+          #apt-get install -y tzdata gnupg
+          #apt-get install -y $BUILD_DEPENDS
+          #apt-get autoremove --purge -y
+          #apt-get clean
+          #echo "$TIME_ZONE" > /etc/timezone
+          #mkdir -p /workdir/
+          #chown $(id -u):$(id -g) /workdir/
+          apt update -y
+          apt full-upgrade -y
+          apt install -y $BUILD_DEPENDS
 
       - name: 克隆源代码
         working-directory: /workdir
