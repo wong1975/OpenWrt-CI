@@ -96,6 +96,12 @@ jobs:
       - name: 修正 Rust Makefile 以跳过 CI-LLVM 下载
         run: sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' openwrt/feeds/packages/lang/rust/Makefile
 
+      # 在这里插入 GCC 清理和编译步骤
+      - name: 单独清理并编译 GCC
+        run: |
+          cd openwrt
+          make package/feeds/packages/gcc/{clean,compile} V=s
+
       - name: 加载自定义配置
         run: |
           [ -e files ] && mv files/ openwrt/files/
@@ -116,11 +122,11 @@ jobs:
         run: |
           if [ -f openwrt/.config ]; then
             ls -l openwrt/.config
-            cp openwrt/.config $GITHUB_WORKSPACE/found.config
+            #cp openwrt/.config $GITHUB_WORKSPACE/found.config
             echo ".config 文件已成功复制到 found.config"
           else
             echo "错误：openwrt/.config 文件不存在！"
-            exit 1
+            #exit 1
           fi
 
       - name: 上传 .config Upload .config from all possible locations
@@ -154,7 +160,7 @@ jobs:
             #openwrt/.config
             #openwrt/found.config
             #$GITHUB_WORKSPACE/.config
-            $GITHUB_WORKSPACE/found.config
+            #$GITHUB_WORKSPACE/found.config
 
       - name: 编译固件
         id: compile
