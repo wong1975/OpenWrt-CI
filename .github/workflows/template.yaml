@@ -87,7 +87,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           df -hT $PWD
-          git clone --depth 1 --branch $REPO_BRANCH --single-branch $REPO_URL immortalwrt/
+          git clone --depth 1 --branch "$REPO_BRANCH" --single-branch "$REPO_URL" openwrt/
           #git clone -b <branch> --single-branch --filter=blob:none https://github.com/immortalwrt/immortalwrt
           #ln -sf $GITHUB_WORKSPACE/immortalwrt
 
