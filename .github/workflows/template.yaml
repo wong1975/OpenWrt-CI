@@ -148,12 +148,12 @@ jobs:
         with:
           name: XiaoMi-AX3600
           path: |
-            #.config
+            .config
             found.config
             #openwrt/.config
             #openwrt/found.config
-            #$GITHUB_WORKSPACE/.config
-            #$GITHUB_WORKSPACE/found.config
+            $GITHUB_WORKSPACE/.config
+            $GITHUB_WORKSPACE/found.config
 
       - name: 单独清理并编译 GCC
         run: |
