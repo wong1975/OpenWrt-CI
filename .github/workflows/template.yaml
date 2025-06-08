@@ -69,9 +69,9 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          apt-get update -y
-          apt-get full-upgrade -y
-          apt-get install -y $BUILD_DEPENDS
+          sudo apt-get update -y
+          sudo apt-get full-upgrade -y
+          sudo apt-get install -y $BUILD_DEPENDS
 
       - name: 克隆源代码
         working-directory: ${{ github.workspace }}
