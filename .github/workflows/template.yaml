@@ -4,10 +4,10 @@
 # 本软件遵循 MIT 许可证开源发布。
 # 详情请查看 /LICENSE 文件。
 # 
-# https://github.com/Curious-r/OpenWrtBuildWorkflows
-# 说明：自动检查 OpenWrt 源代码更新并进行编译，无需额外的密钥。
+# https://github.com/Curious-r/immortalwrtBuildWorkflows
+# 说明：自动检查 immortalwrt 源代码更新并进行编译，无需额外的密钥。
 #
-# 部分功能源自 https://github.com/P3TERX/Actions-OpenWrt，访问该仓库以获取相关版权信息。
+# 部分功能源自 https://github.com/P3TERX/Actions-immortalwrt，访问该仓库以获取相关版权信息。
 #-------------------------------------------------------------------------------------------------------
 
 name: 为 Example-Device 构建 Example-Firmware
@@ -77,43 +77,43 @@ jobs:
           #apt-get autoremove --purge -y
           #apt-get clean
           #echo "$TIME_ZONE" > /etc/timezone
-          #mkdir -p /workdir/
-          #chown $(id -u):$(id -g) /workdir/
+          #mkdir -p $GITHUB_WORKSPACE/
+          #chown $(id -u):$(id -g) $GITHUB_WORKSPACE/
           apt update -y
           apt full-upgrade -y
           apt install -y $BUILD_DEPENDS
 
       - name: 克隆源代码
-        working-directory: /workdir
+        working-directory: $GITHUB_WORKSPACE
         run: |
           df -hT $PWD
-          git clone --depth 1 --branch $REPO_BRANCH --single-branch $REPO_URL openwrt/
+          git clone --depth 1 --branch $REPO_BRANCH --single-branch $REPO_URL immortalwrt/
           #git clone -b <branch> --single-branch --filter=blob:none https://github.com/immortalwrt/immortalwrt
-          ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+          ln -sf $GITHUB_WORKSPACE/immortalwrt $GITHUB_WORKSPACE/immortalwrt
 
       - name: 运行自定义脚本 1
         if: env.CUSTOM_SCRIPT_1
         run: |
           chmod +x $CUSTOM_SCRIPT_1 || true
-          cd openwrt/
+          cd immortalwrt/
           [ -f "$GITHUB_WORKSPACE/$CUSTOM_SCRIPT_1" ] && $GITHUB_WORKSPACE/$CUSTOM_SCRIPT_1 || echo "无自定义脚本1"
 
       - name: 更新 feeds
-        run: cd openwrt/ && ./scripts/feeds update -a
+        run: cd immortalwrt/ && ./scripts/feeds update -a
 
       - name: 安装 feeds
-        run: cd openwrt/ && ./scripts/feeds install -a
+        run: cd immortalwrt/ && ./scripts/feeds install -a
 
       - name: 加载自定义配置
         run: |
-          [ -e files ] && mv files/ openwrt/files/
-          [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+          [ -e files ] && mv files/ immortalwrt/files/
+          [ -e $CONFIG_FILE ] && mv $CONFIG_FILE immortalwrt/.config
 
       - name: 运行自定义脚本 2
         if: env.CUSTOM_SCRIPT_2
         run: |
           chmod +x $CUSTOM_SCRIPT_2 || true
-          cd openwrt/
+          cd immortalwrt/
           [ -f "$GITHUB_WORKSPACE/$CUSTOM_SCRIPT_2" ] && $GITHUB_WORKSPACE/$CUSTOM_SCRIPT_2 || echo "无自定义脚本2"
 
       - name: SSH 远程调试（tmate）进入 menuconfig
@@ -125,14 +125,14 @@ jobs:
         with:
           name: config
           path: |
-            $GITHUB_WORKSPACE/openwrt/.config
+            $GITHUB_WORKSPACE/immortalwrt/.config
             found.config
             .config
 
       - name: 下载编译所需的软件包
         id: download-packages
         run: |
-          cd openwrt/
+          cd immortalwrt/
           make defconfig
           make download -j8
           find dl -size -1024c -exec ls -l {} \;
@@ -141,7 +141,7 @@ jobs:
       - name: 编译固件
         id: compile
         run: |
-          cd openwrt/
+          cd immortalwrt/
           echo -e "$(nproc) 线程编译"
           make -j$(nproc) || make -j1 || make -j1 V=s
           echo "status=success" >> $GITHUB_OUTPUT
@@ -157,13 +157,13 @@ jobs:
         uses: actions/upload-artifact@main
         if: steps.compile.outputs.status == 'success' && env.STORE_PRODUCTS == 'true'
         with:
-          name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-          path: openwrt/bin/
+          name: immortalwrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+          path: immortalwrt/bin/
 
       - name: 整理固件相关文件
         id: organize-files
         run: |
-          cd openwrt/bin/targets/*/*
+          cd immortalwrt/bin/targets/*/*
           rm -rf packages/
           echo "FIRMWARE=$PWD" >> $GITHUB_ENV
           echo "status=success" >> $GITHUB_OUTPUT
@@ -172,7 +172,7 @@ jobs:
         uses: actions/upload-artifact@main
         if: steps.organize-files.outputs.status == 'success' && env.STORE_FIRMWARE == 'true' && !cancelled()
         with:
-          name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+          name: immortalwrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
           path: ${{ env.FIRMWARE }}
 
       - name: 上传固件到 Cowtransfer
