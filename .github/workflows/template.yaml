@@ -150,8 +150,8 @@ jobs:
           path: |
             .config
             found.config
-            #openwrt/.config
-            #openwrt/found.config
+            openwrt/.config
+            openwrt/found.config
             $GITHUB_WORKSPACE/.config
             $GITHUB_WORKSPACE/found.config
 
