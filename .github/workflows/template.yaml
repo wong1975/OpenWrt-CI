@@ -136,7 +136,7 @@ jobs:
         run: |
           cd openwrt/
           make defconfig
-          cp .config $GITHUB_WORKSPACE/XiaoMi-AX3600.config
+          #cp .config $GITHUB_WORKSPACE/XiaoMi-AX3600.config
           make download -j8
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
@@ -146,8 +146,10 @@ jobs:
         with:
           name: XiaoMi-AX3600
           path: |
-            XiaoMi-AX3600.config
-            $GITHUB_WORKSPACE/XiaoMi-AX3600.config
+            .config
+            openwrt/.config
+            $GITHUB_WORKSPACE/
+            .config
 
 
       - name: 编译固件
