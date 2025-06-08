@@ -96,16 +96,16 @@ jobs:
       - name: 修正 Rust Makefile 以跳过 CI-LLVM 下载
         run: sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' openwrt/feeds/packages/lang/rust/Makefile
 
+      - name: 加载自定义配置
+        run: |
+          [ -e files ] && mv files/ openwrt/files/
+          [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+
       # 在这里插入 GCC 清理和编译步骤
       - name: 单独清理并编译 GCC
         run: |
           cd openwrt
           make package/feeds/packages/gcc/{clean,compile} V=s
-
-      - name: 加载自定义配置
-        run: |
-          [ -e files ] && mv files/ openwrt/files/
-          [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
 
       - name: 运行自定义脚本 2
         if: env.CUSTOM_SCRIPT_2
