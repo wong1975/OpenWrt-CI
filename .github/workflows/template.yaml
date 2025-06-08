@@ -79,10 +79,10 @@ jobs:
           #echo "$TIME_ZONE" > /etc/timezone
           #mkdir -p $GITHUB_WORKSPACE/
           #chown $(id -u):$(id -g) $GITHUB_WORKSPACE/
-          apt update -y
-          apt full-upgrade -y
-          apt install -y $BUILD_DEPENDS
-
+          apt-get update -y
+          apt-get full-upgrade -y
+          apt-get install -y $BUILD_DEPENDS $BUILD_DEPENDS
+          
       - name: 克隆源代码
         working-directory: $GITHUB_WORKSPACE
         run: |
