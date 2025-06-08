@@ -84,12 +84,12 @@ jobs:
           apt-get install -y $BUILD_DEPENDS $BUILD_DEPENDS
           
       - name: 克隆源代码
-        working-directory: $GITHUB_WORKSPACE
+        working-directory: ${{ github.workspace }}
         run: |
           df -hT $PWD
           git clone --depth 1 --branch $REPO_BRANCH --single-branch $REPO_URL immortalwrt/
           #git clone -b <branch> --single-branch --filter=blob:none https://github.com/immortalwrt/immortalwrt
-          ln -sf $GITHUB_WORKSPACE/immortalwrt
+          #ln -sf $GITHUB_WORKSPACE/immortalwrt
 
       - name: 运行自定义脚本 1
         if: env.CUSTOM_SCRIPT_1
