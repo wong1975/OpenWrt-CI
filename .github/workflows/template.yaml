@@ -109,8 +109,16 @@ jobs:
         if: ${{ github.event.inputs.manual_config == 'y' }}
         uses: mxschmitt/action-tmate@v3
 
-      - name: 检查 .config 是否存在
-        run: ls -l openwrt/.config
+      - name: 检查并复制 .config 文件
+        run: |
+          if [ -f openwrt/.config ]; then
+            ls -l openwrt/.config
+            cp openwrt/.config $GITHUB_WORKSPACE/found.config
+            echo ".config 文件已成功复制到 found.config"
+          else
+            echo "错误：openwrt/.config 文件不存在！"
+            exit 1
+          fi
 
       - name: 上传 .config Upload .config from all possible locations
         uses: actions/upload-artifact@v4
@@ -120,7 +128,7 @@ jobs:
             .config
             openwrt/.config
             openwrt/found.config
-            $GITHUB_WORKSPACE/openwrt/.config
+            $GITHUB_WORKSPACE/openwrt/found.config
             found.config
 
       - name: 下载编译所需的软件包
