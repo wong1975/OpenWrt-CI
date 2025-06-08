@@ -101,12 +101,6 @@ jobs:
           [ -e files ] && mv files/ openwrt/files/
           [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
 
-      # 在这里插入 GCC 清理和编译步骤
-      - name: 单独清理并编译 GCC
-        run: |
-          cd openwrt
-          make package/feeds/packages/gcc/{clean,compile} V=s
-
       - name: 运行自定义脚本 2
         if: env.CUSTOM_SCRIPT_2
         run: |
@@ -143,8 +137,7 @@ jobs:
       - name: 下载编译所需的软件包
         id: download-packages
         run: |
-          cd openwrt/
-          make defconfig
+          cd openwrt/ && make defconfig #生成默认配置
           #cp .config $GITHUB_WORKSPACE/XiaoMi-AX3600.config
           make download -j8
           find dl -size -1024c -exec ls -l {} \;
@@ -161,6 +154,11 @@ jobs:
             #openwrt/found.config
             #$GITHUB_WORKSPACE/.config
             #$GITHUB_WORKSPACE/found.config
+
+      - name: 单独清理并编译 GCC
+        run: |
+          cd openwrt
+          make package/feeds/packages/gcc/{clean,compile} V=s
 
       - name: 编译固件
         id: compile
