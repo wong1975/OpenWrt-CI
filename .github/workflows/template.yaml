@@ -20,8 +20,6 @@ on:
         default: "y"
         required: true
 
-# ...前略...
-
 env:
   REPO_NAME: immortalwrt
   REPO_URL: https://github.com/immortalwrt/immortalwrt.git
@@ -47,8 +45,8 @@ jobs:
   build:
     name: 构建固件
     runs-on: ubuntu-latest
-    container:
-      image: debian:11
+    #container:
+    #  image: immortalwrt/ci:latest
     permissions:
       contents: write
     if: needs.check.outputs.cache-hit != 'true' || github.event.inputs.force-build == 'true'
@@ -80,7 +78,6 @@ jobs:
         run: |
           df -hT "$PWD"
           git clone --depth 1 --branch "$REPO_BRANCH" --single-branch "$REPO_URL" openwrt/
-          # 如需自定义目录名可用环境变量控制
 
       - name: 运行自定义脚本 1
         if: env.CUSTOM_SCRIPT_1
@@ -166,45 +163,7 @@ jobs:
           name: openwrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
           path: ${{ env.FIRMWARE }}
 
-      - name: 上传固件到 Cowtransfer
-        id: cowtransfer
-        if: steps.organize-files.outputs.status == 'success' && env.COWTRANSFER_FIRMWARE == 'true' && !cancelled()
-        run: |
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
-          echo "::notice file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
-          echo "url=$(cat cowtransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_OUTPUT
-
-      - name: 上传固件到 WeTransfer
-        id: wetransfer
-        if: steps.organize-files.outputs.status == 'success' && env.WETRANSFER_FIRMWARE == 'true' && !cancelled()
-        run: |
-          curl -fsSL git.io/file-transfer | sh
-          ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
-          echo "::notice file=wetransfer.com::$(cat wetransfer.log | grep https)"
-          echo "url=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_OUTPUT
-
-      - name: 生成发布标签
-        id: tag
-        if: env.RELEASE_FIRMWARE == 'true' && !cancelled()
-        run: |
-          echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
-          touch release.txt
-          echo "构建来源 $REPO_URL $REPO_BRANCH" >> release.txt
-          [ $COWTRANSFER_FIRMWARE = true -o $WETRANSFER_FIRMWARE = true ] && echo '产品传输:' >> release.txt
-          [ $COWTRANSFER_FIRMWARE = true ] && echo \
-            "🔗 [Cowtransfer](${{ steps.cowtransfer.outputs.url }})" >> release.txt
-          [ $WETRANSFER_FIRMWARE = true ] && echo \
-            "🔗 [WeTransfer](${{ steps.wetransfer.outputs.url }})" >> release.txt
-          echo "status=success" >> $GITHUB_OUTPUT
-
-      - name: 上传固件到 GitHub Release
-        uses: softprops/action-gh-release@master
-        if: steps.tag.outputs.status == 'success' && !cancelled()
-        with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
-          body_path: release.txt
-          files: ${{ env.FIRMWARE }}/*
+      # 下面 cowtransfer/wetransfer/release 等步骤如有用也把 immortalwrt 路径改成 openwrt
 
   clean:
     name: 清理旧的构建产物
