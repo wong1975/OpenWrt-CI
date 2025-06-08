@@ -108,14 +108,19 @@ jobs:
         if: ${{ github.event.inputs.manual_config == 'y' }}
         uses: mxschmitt/action-tmate@v3
 
-      - name: Upload .config from all possible locations
+      - name: 检查 .config 是否存在
+        run: ls -l openwrt/.config
+
+      - name: 上传 .config Upload .config from all possible locations
         uses: actions/upload-artifact@v4
         with:
           name: config
           path: |
+            .config
+            openwrt/.config
+            openwrt/found.config
             $GITHUB_WORKSPACE/openwrt/.config
             found.config
-            .config
 
       - name: 下载编译所需的软件包
         id: download-packages
